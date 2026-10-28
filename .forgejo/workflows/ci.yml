@@ -17,6 +17,7 @@ jobs:
         with:
           toolchain: "1.96.0"
           components: rustfmt, clippy
+          targets: wasm32-unknown-unknown
       - name: Native HTTP example build dependencies
         run: apt-get update -qq && apt-get install -y -qq pkg-config libssl-dev libcurl4-openssl-dev
       - name: Format
@@ -28,8 +29,11 @@ jobs:
           set -euo pipefail
           cargo test --all-features --locked
           cargo test --tests --examples --locked
+          cargo test --doc --locked
           cargo test --doc --no-default-features --locked
           cargo test --tests --features curl --no-default-features --locked
+      - name: WASM compatibility
+        run: cargo check --target wasm32-unknown-unknown --locked
       - name: Fetch advisory database
         run: |
           set -euo pipefail

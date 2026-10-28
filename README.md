@@ -29,14 +29,18 @@ cargo +1.96.0 fmt --all --check
 cargo +1.96.0 clippy --all-targets --all-features --locked -- -D warnings
 cargo +1.96.0 test --all-features --locked
 cargo +1.96.0 test --tests --examples --locked
+cargo +1.96.0 test --doc --locked
 cargo +1.96.0 test --doc --no-default-features --locked
 cargo +1.96.0 test --tests --features curl --no-default-features --locked
+rustup target add --toolchain 1.96.0 wasm32-unknown-unknown
+cargo +1.96.0 check --target wasm32-unknown-unknown --locked
 cargo audit
 osv-scanner scan source --lockfile Cargo.lock
 ```
 
-The pre-existing two ignored doc examples need real external credentials; tests
-do not authenticate to external providers. RFC 7636 Appendix B and independently
+The two pre-existing ignored doc snippets are incomplete function-signature
+illustrations, not executable examples. Tests do not authenticate to external
+providers. RFC 7636 Appendix B and independently
 computed 43/64/65/128-character PKCE vectors guard hashing and encoding, including
 block boundaries and the unchanged u32 random-length API. Consumer integration
 must additionally prove Matrix's existing encrypted stores and derived keys.
