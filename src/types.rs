@@ -653,6 +653,27 @@ mod tests {
     }
 
     #[test]
+    fn pkce_sha256_golden_boundaries_preserve_v5_api() {
+        // Independently computed with Python hashlib/base64; valid RFC 7636
+        // verifier lengths straddle the SHA-256 block boundary. The existing
+        // test_code_verifier_challenge also pins RFC 7636 Appendix B.
+        let _: fn(u32) -> (PkceCodeChallenge, PkceCodeVerifier) =
+            PkceCodeChallenge::new_random_sha256_len;
+        for (length, expected) in [
+            (43, "ZtNPunH49FD35FWYhT5Tv8I7vRKQJ8uxMaL0_9eHjNA"),
+            (64, "_-BU_nrgy23GXDr5th1SCfQ5hR20PQulmXM33xVGaOs"),
+            (65, "Y1NhxIu56rFBmOduqKt_GkFoXWrWKqkUbTAdTxfrCuA"),
+            (128, "aDbPE7rEAOkQUHHNavRwhN-srU5eMCyUv-0k4BOvtz4"),
+        ] {
+            let verifier = PkceCodeVerifier::new("a".repeat(length));
+            let challenge = PkceCodeChallenge::from_code_verifier_sha256(&verifier);
+            assert_eq!(challenge.as_str(), expected);
+            assert_eq!(challenge.method().as_str(), "S256");
+            assert!(!challenge.as_str().contains('='));
+        }
+    }
+
+    #[test]
     fn test_code_verifier_challenge() {
         // Example from https://tools.ietf.org/html/rfc7636#appendix-B
         let code_verifier =
